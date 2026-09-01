@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Final Lap</title>
+<style>
+  :root{
+    --bg:#0b0713;
+    --bg-elev:#150f22;
+    --bg-card:#181128;
+    --violet:#a855f7;
+    --violet-dim:#7c3aed;
+    --violet-glow: rgba(168,85,247,0.35);
+    --text:#ece7f7;
+    --text-soft:#948dab;
+    --line: rgba(255,255,255,0.08);
+
+    --phy:#5ad1e6;
+    --chem:#5be08a;
+    --math:#f0a94e;
+
+    --mono:"SFMono-Regular","Menlo","Consolas",monospace;
+    --disp:"Helvetica Neue",Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{
+    background:
+      radial-gradient(circle at 15% 0%, rgba(124,58,237,0.16), transparent 45%),
+      radial-gradient(circle at 90% 20%, rgba(168,85,247,0.10), transparent 40%),
+      var(--bg);
+    color:var(--text);
+    font-family:var(--disp);
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .wrap{max-width:720px; margin:0 auto; padding:40px 18px 90px;}
+
+  .ig-tag{
+    position:fixed; top:14px; left:14px; z-index:20;
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:var(--mono); font-size:11.5px; color:var(--text-soft);
+    background:var(--bg-card); border:1px solid var(--line); border-radius:20px;
+    padding:6px 12px 6px 8px; text-decoration:none;
+    transition:border-color .15s, color .15s;
+  }
+  .ig-tag:hover{border-color:var(--violet); color:var(--text);}
+  .ig-tag svg{width:14px; height:14px; flex:none;}
+
+  /* header */
+  header{
+    display:flex; justify-content:space-between; align-items:flex-start; gap:20px; flex-wrap:wrap;
+    padding-bottom:22px; border-bottom:1px solid var(--line); margin-bottom:26px;
+  }
+  .brand .eyebrow{
+    font-family:var(--mono); font-size:11px; color:var(--violet); letter-spacing:.12em;
+  }
+  .brand h1{
+    margin:6px 0 0; font-size:38px; font-weight:800; letter-spacing:-.01em;
+    background:linear-gradient(90deg,#fff, #c9a6f7 70%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .brand .sub{font-family:var(--mono); font-size:11.5px; color:var(--text-soft); margin-top:6px; letter-spacing:.03em;}
+
+  /* countdown */
+  .countdown{
+    display:flex; gap:10px;
+  }
+  .cbox{
+    background:var(--bg-card); border:1px solid var(--line); border-radius:10px;
+    padding:10px 12px; text-align:center; min-width:56px;
+    box-shadow: 0 0 24px -8px var(--violet-glow) inset;
+  }
+  .cbox .n{font-family:var(--mono); font-size:22px; font-weight:700; color:var(--text); line-height:1;}
+  .cbox .u{font-family:var(--mono); font-size:9px; color:var(--text-soft); letter-spacing:.08em; margin-top:5px;}
+
+  /* overall ring */
+  .overall{
+    display:flex; align-items:center; gap:20px; margin-bottom:32px;
+    background:var(--bg-elev); border:1px solid var(--line); border-radius:16px; padding:20px;
+  }
+  .ring-wrap{position:relative; width:96px; height:96px; flex:none;}
+  .ring-wrap svg{transform:rotate(-90deg);}
+  .ring-track{fill:none; stroke:var(--line); stroke-width:8;}
+  .ring-fill{fill:none; stroke:url(#ringGrad); stroke-width:8; stroke-linecap:round; transition:stroke-dashoffset .5s ease;}
+  .ring-label{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-weight:700; font-size:18px;
+  }
+  .overall-text{font-family:var(--mono); font-size:12.5px; color:var(--text-soft); line-height:1.6;}
+  .overall-text b{color:var(--text); font-size:14px; display:block;}
+
+  /* subject tabs */
+  .tabs{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:30px;}
+  .tab{
+    cursor:pointer; border:1px solid var(--line); border-radius:14px; padding:16px 10px;
+    background:var(--bg-card); text-align:center; transition:border-color .15s, transform .1s, box-shadow .15s;
+  }
+  .tab:hover{transform:translateY(-2px);}
+  .tab .name{font-size:14.5px; font-weight:700; font-family:var(--disp);}
+  .tab .count{font-family:var(--mono); font-size:10.5px; color:var(--text-soft); margin-top:8px;}
+  .tab .ring-wrap{width:48px; height:48px; margin:8px auto 4px;}
+  .tab .ring-label{font-size:11px;}
+
+  .tab[data-subject="physics"].active{border-color:var(--phy); box-shadow:0 0 24px -10px var(--phy);}
+  .tab[data-subject="chemistry"].active{border-color:var(--chem); box-shadow:0 0 24px -10px var(--chem);}
+  .tab[data-subject="maths"].active{border-color:var(--math); box-shadow:0 0 24px -10px var(--math);}
+
+  /* chapter list */
+  .list-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;}
+  .list-head h2{font-size:16px; margin:0; display:flex; align-items:center; gap:9px; font-family:var(--disp);}
+  .list-head .dot{width:9px; height:9px; border-radius:50%; box-shadow:0 0 10px 1px currentColor;}
+  .list-head .stat{font-family:var(--mono); font-size:11.5px; color:var(--text-soft);}
+
+  .chapter{
+    display:flex; align-items:flex-start; gap:12px; padding:13px 6px;
+    border-bottom:1px solid var(--line);
+  }
+  .chapter.done{opacity:.42;}
+  .chapter.done .title{text-decoration:line-through; text-decoration-color:var(--text-soft);}
+
+  .box{
+    flex:none; width:20px; height:20px; margin-top:2px; border-radius:6px;
+    border:1.5px solid var(--text-soft); background:transparent; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .box svg{width:12px; height:12px; opacity:0;}
+  .chapter.done .box svg{opacity:1;}
+
+  .meta{flex:1;}
+  .title{font-size:15px; font-weight:600; line-height:1.3; font-family:var(--disp);}
+  .desc{font-size:12.5px; color:var(--text-soft); margin-top:3px; line-height:1.4;}
+
+  .controls{display:flex; gap:8px; margin:14px 0 16px; font-family:var(--mono); font-size:11.5px;}
+  .controls button{
+    border:1px solid var(--line); background:var(--bg-card); color:var(--text-soft);
+    padding:6px 12px; border-radius:16px; cursor:pointer;
+  }
+  .controls button.active{background:var(--violet-dim); color:#fff; border-color:var(--violet-dim);}
+
+  footer{margin-top:44px; text-align:center; font-family:var(--mono); font-size:11px; color:var(--text-soft);}
+  footer button{
+    font-family:var(--mono); font-size:11px; background:var(--bg-card); border:1px solid var(--line);
+    color:var(--text-soft); padding:6px 12px; border-radius:16px; cursor:pointer; margin-top:10px;
+  }
+
+  @media (max-width:520px){
+    .tabs{grid-template-columns:1fr 1fr 1fr; gap:8px;}
+    .cbox{min-width:44px; padding:8px 6px;}
+    .cbox .n{font-size:17px;}
+    .brand h1{font-size:30px;}
+  }
+</style>
+</head>
+<body>
+<a class="ig-tag" href="https://www.instagram.com/yashhh.goelll/?hl=en" target="_blank" rel="noopener">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
+  @yashhh.goelll
+</a>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="eyebrow">JEE MAIN · COUNTDOWN</div>
+      <h1>Final Lap</h1>
+      <div class="sub">CHAPTER TRACKER</div>
+    </div>
+    <div class="countdown" id="countdown">
+      <div class="cbox"><div class="n" id="cMonths">0</div><div class="u">MONTHS</div></div>
+      <div class="cbox"><div class="n" id="cDays">0</div><div class="u">DAYS</div></div>
+      <div class="cbox"><div class="n" id="cHours">0</div><div class="u">HRS</div></div>
+      <div class="cbox"><div class="n" id="cMins">0</div><div class="u">MIN</div></div>
+      <div class="cbox"><div class="n" id="cSecs">0</div><div class="u">SEC</div></div>
+    </div>
+  </header>
+
+  <div class="overall">
+    <div class="ring-wrap">
+      <svg viewBox="0 0 100 100" width="96" height="96">
+        <defs>
+          <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#a855f7"/>
+            <stop offset="100%" stop-color="#ec4899"/>
+          </linearGradient>
+        </defs>
+        <circle class="ring-track" cx="50" cy="50" r="42"/>
+        <circle class="ring-fill" id="overallRing" cx="50" cy="50" r="42" stroke-dasharray="264" stroke-dashoffset="264"/>
+      </svg>
+      <div class="ring-label" id="overallPct">0%</div>
+    </div>
+    <div class="overall-text">
+      <b id="overallCount">0/0 chapters cleared</b>
+      Across Physics, Chemistry &amp; Maths.
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="list-head">
+    <h2><span class="dot" id="activeDot"></span><span id="activeName">Physics</span></h2>
+    <span class="stat" id="activeStat">0/0</span>
+  </div>
+
+  <div class="controls">
+    <button id="hideDone">Hide completed</button>
+  </div>
+
+  <div id="chapterList"></div>
+
+  <footer>
+    Progress is saved on this device only (localStorage).
+    <br><button id="resetBtn">reset all progress</button>
+  </footer>
+</div>
+
+<script>
+const TARGET_DATE = "2027-01-10T00:00:00";
+
+const SUBJECTS = {
+  physics: {
+    label: "Physics", color: "#5ad1e6",
+    chapters: [
+      ["Units and Measurements","SI units, dimensions, and error analysis."],
+      ["Kinematics","Motion in a straight line and in a plane."],
+      ["Laws of Motion","Newton's laws and friction."],
+      ["Work, Energy and Power","Work-energy theorem and conservation laws."],
+      ["Rotational Motion","Center of mass, torque, and angular momentum."],
+      ["Gravitation","Kepler's laws and planetary motion."],
+      ["Properties of Solids and Fluids","Elasticity, Pascal's law, and Bernoulli's theorem."],
+      ["Thermodynamics","Laws of thermodynamics and heat engines."],
+      ["Kinetic Theory of Gases","Equation of state and RMS speed."],
+      ["Oscillations and Waves","Simple harmonic motion (SHM) and Doppler effect."],
+      ["Electrostatics","Electric charges, fields, and potential."],
+      ["Current Electricity","Ohm's law, Kirchhoff's laws, and circuits."],
+      ["Magnetic Effects of Current and Magnetism","Biot-Savart law and magnetic properties."],
+      ["Electromagnetic Induction (EMI) and Alternating Currents (AC)","Faraday's laws and LC/RC circuits."],
+      ["Electromagnetic Waves","Displacement current and EM spectrum."],
+      ["Optics","Ray optics (mirrors/lenses) and wave optics (interference/diffraction)."],
+      ["Dual Nature of Matter and Radiation","Photoelectric effect and de Broglie wavelength."],
+      ["Atoms and Nuclei","Bohr model, radioactivity, and nuclear binding energy."],
+      ["Semiconductors",""]
+    ]
+  },
+  chemistry: {
+    label: "Chemistry", color: "#5be08a",
+    chapters: [
+      ["Some Basic Concepts in Chemistry (Mole Concept)",""],
+      ["Atomic Structure",""],
+      ["Chemical Thermodynamics",""],
+      ["Chemical and Ionic Equilibrium",""],
+      ["Solutions",""],
+      ["Redox Reactions and Electrochemistry",""],
+      ["Chemical Kinetics",""],
+      ["Classification of Elements and Periodicity in Properties",""],
+      ["Chemical Bonding and Molecular Structure",""],
+      ["p-Block Elements",""],
+      ["d- and f-Block Elements",""],
+      ["Coordination Compounds",""],
+      ["Purification and Characterisation of Organic Compounds",""],
+      ["Some Basic Principles of Organic Chemistry (GOC)",""],
+      ["Hydrocarbons",""],
+      ["Organic Compounds Containing Halogens (Haloalkanes and Haloarenes)",""],
+      ["Organic Compounds Containing Oxygen (Alcohols, Phenols, Ethers, Aldehydes, Ketones, Carboxylic Acids)",""],
+      ["Organic Compounds Containing Nitrogen (Amines and Diazonium Salts)",""],
+      ["Biomolecules",""]
+    ]
+  },
+  maths: {
+    label: "Maths", color: "#f0a94e",
+    chapters: [
+      ["Sets, Relations, and Functions",""],
+      ["Complex Numbers and Quadratic Equations",""],
+      ["Matrices and Determinants",""],
+      ["Permutations and Combinations",""],
+      ["Binomial Theorem",""],
+      ["Sequence and Series",""],
+      ["Limits, Continuity, and Differentiability",""],
+      ["Integral Calculus",""],
+      ["Differential Equations",""],
+      ["Coordinate Geometry",""]
+    ]
+  }
+};
+
+const STORAGE_KEY = "jee-chapter-tracker-v1";
+let state = {};
+try { state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e){ state = {}; }
+
+let active = "physics";
+let hideDone = false;
+
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function key(sub, i){ return sub + "-" + i; }
+
+function subjectStats(sub){
+  const chs = SUBJECTS[sub].chapters;
+  let done = 0;
+  chs.forEach((c,i) => { if (state[key(sub,i)]) done++; });
+  return { done, total: chs.length };
+}
+
+function ringSVG(pct, color, size){
+  const r = 42, C = 2*Math.PI*r;
+  const offset = C - (pct/100)*C;
+  return `<svg viewBox="0 0 100 100" width="${size}" height="${size}">
+    <circle cx="50" cy="50" r="${r}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="9"/>
+    <circle cx="50" cy="50" r="${r}" fill="none" stroke="${color}" stroke-width="9" stroke-linecap="round"
+      stroke-dasharray="${C}" stroke-dashoffset="${offset}" transform="rotate(-90 50 50)"/>
+  </svg>`;
+}
+
+function renderTabs(){
+  const el = document.getElementById("tabs");
+  el.innerHTML = "";
+  Object.keys(SUBJECTS).forEach(sub => {
+    const { done, total } = subjectStats(sub);
+    const pct = total ? Math.round((done/total)*100) : 0;
+    const div = document.createElement("div");
+    div.className = "tab" + (sub === active ? " active" : "");
+    div.dataset.subject = sub;
+    div.innerHTML = `
+      <div class="name">${SUBJECTS[sub].label}</div>
+      <div class="ring-wrap">
+        ${ringSVG(pct, SUBJECTS[sub].color, 48)}
+        <div class="ring-label">${pct}%</div>
+      </div>
+      <div class="count">${done}/${total} done</div>
+    `;
+    div.addEventListener("click", () => { active = sub; renderAll(); });
+    el.appendChild(div);
+  });
+}
+
+function renderList(){
+  const sub = SUBJECTS[active];
+  document.getElementById("activeName").textContent = sub.label;
+  const dot = document.getElementById("activeDot");
+  dot.style.background = sub.color;
+  dot.style.color = sub.color;
+
+  const { done, total } = subjectStats(active);
+  document.getElementById("activeStat").textContent = `${done}/${total}`;
+
+  const listEl = document.getElementById("chapterList");
+  listEl.innerHTML = "";
+  sub.chapters.forEach((ch, i) => {
+    const k = key(active, i);
+    const isDone = !!state[k];
+    if (hideDone && isDone) return;
+    const [title, desc] = ch;
+    const row = document.createElement("div");
+    row.className = "chapter" + (isDone ? " done" : "");
+    row.innerHTML = `
+      <div class="box" style="${isDone ? `background:${sub.color};border-color:${sub.color};` : ""}" role="checkbox" aria-checked="${isDone}" tabindex="0">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 4.5" stroke="#0b0713" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="meta">
+        <div class="title">${title}</div>
+        ${desc ? `<div class="desc">${desc}</div>` : ""}
+      </div>
+    `;
+    const toggle = () => { state[k] = !state[k]; save(); renderAll(); };
+    row.querySelector(".box").addEventListener("click", toggle);
+    row.querySelector(".box").addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " "){ e.preventDefault(); toggle(); }
+    });
+    listEl.appendChild(row);
+  });
+}
+
+function renderOverall(){
+  let done = 0, total = 0;
+  Object.keys(SUBJECTS).forEach(sub => {
+    const s = subjectStats(sub);
+    done += s.done; total += s.total;
+  });
+  document.getElementById("overallCount").textContent = `${done}/${total} chapters cleared`;
+  const pct = total ? Math.round((done/total)*100) : 0;
+  document.getElementById("overallPct").textContent = pct + "%";
+  const r = 42, C = 2*Math.PI*r;
+  document.getElementById("overallRing").setAttribute("stroke-dasharray", C);
+  document.getElementById("overallRing").setAttribute("stroke-dashoffset", C - (pct/100)*C);
+}
+
+function renderAll(){
+  renderTabs();
+  renderList();
+  renderOverall();
+}
+
+function addMonths(date, n){
+  const d = new Date(date);
+  d.setMonth(d.getMonth() + n);
+  return d;
+}
+
+function renderCountdown(){
+  const now = new Date();
+  const target = new Date(TARGET_DATE);
+  let diffMs = target - now;
+  if (diffMs < 0) diffMs = 0;
+
+  // calendar-accurate months, then remainder broken into d/h/m/s
+  let months = 0;
+  let cursor = new Date(now);
+  while (addMonths(cursor, 1) <= target){
+    cursor = addMonths(cursor, 1);
+    months++;
+  }
+  let remainMs = target - cursor;
+  const days = Math.floor(remainMs / (1000*60*60*24));
+  remainMs -= days * (1000*60*60*24);
+  const hours = Math.floor(remainMs / (1000*60*60));
+  remainMs -= hours * (1000*60*60);
+  const mins = Math.floor(remainMs / (1000*60));
+  remainMs -= mins * (1000*60);
+  const secs = Math.floor(remainMs / 1000);
+
+  document.getElementById("cMonths").textContent = months;
+  document.getElementById("cDays").textContent = days;
+  document.getElementById("cHours").textContent = String(hours).padStart(2,"0");
+  document.getElementById("cMins").textContent = String(mins).padStart(2,"0");
+  document.getElementById("cSecs").textContent = String(secs).padStart(2,"0");
+}
+
+document.getElementById("hideDone").addEventListener("click", e => {
+  hideDone = !hideDone;
+  e.target.classList.toggle("active", hideDone);
+  renderList();
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  if (confirm("Clear all completed chapters across all three subjects?")){
+    state = {};
+    save();
+    renderAll();
+  }
+});
+
+renderCountdown();
+setInterval(renderCountdown, 1000);
+renderAll();
+</script>
+</body>
+</html>
